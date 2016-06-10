@@ -10,22 +10,23 @@ angular.module('app', ['ngRoute'])
       })
       .when('/private1', {
         template: '<h1>Private Page 1</h1><a href="#/">Go To Public</a>',
-        resolve: [
-          (authFactory, $location) => authFactory.isLoggedIn || $location.path('/'),
-        ],
+        private: true,
       })
       .when('/private2', {
         template: '<h1>Private Page 2</h1><a href="#/">Go To Public</a>',
-        resolve: [
-          (authFactory, $location) => authFactory.isLoggedIn || $location.path('/'),
-        ],
+        private: true,
       })
       .when('/private3', {
         template: '<h1>Private Page 3</h1><a href="#/">Go To Public</a>',
-        resolve: [
-          (authFactory, $location) => authFactory.isLoggedIn || $location.path('/'),
-        ],
+        private: true,
       })
+  })
+  .run(($rootScope, $location, authFactory) => {
+    $rootScope.$on('$routeChangeStart', function (e, nextRoute) {
+      if (nextRoute.$$route.private && !authFactory.isLoggedIn) {
+        $location.path('/')
+      }
+    })
   })
   .factory('authFactory', () => ({
     isLoggedIn: false,

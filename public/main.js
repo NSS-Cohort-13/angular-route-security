@@ -2,18 +2,14 @@ angular.module('app', ['ngRoute'])
   .config(($routeProvider) => {
     $routeProvider
       .when('/', {
-        controller: 'MainCtrl',
-        controllerAs: 'main',
-        template: '<h1>{{main.heading}}</h1>',
+        template: '<h1>Public Page</h1><a href="#/private">Go To Private</a>',
+      })
+      .when('/private', {
+        template: '<h1>Private Page</h1><a href="#/">Go To Public</a>',
         resolve: [
-          (authFactory) => console.log('Logged In?', authFactory.isLoggedIn)
+          (authFactory, $location) => authFactory.isLoggedIn || $location.path('/'),
         ],
       })
-  })
-  .controller('MainCtrl', function () {
-    const main = this
-
-    main.heading = 'Hello World'
   })
   .factory('authFactory', () => ({
     isLoggedIn: false,

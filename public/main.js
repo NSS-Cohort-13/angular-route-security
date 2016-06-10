@@ -3,31 +3,43 @@ angular.module('app', ['ngRoute'])
     $routeProvider
       .when('/', {
         template: `<h1>Public Page</h1>
-          <a href="#/private1">Go To Private 1</a>
-          <a href="#/private2">Go To Private 2</a>
-          <a href="#/private3">Go To Private 3</a>
+          <a href="#/private">Go To Private</a>
         `,
       })
-      .when('/private1', {
-        template: '<h1>Private Page 1</h1><a href="#/">Go To Public</a>',
+      .when('/private', {
+        template: '<h1>Private Page</h1><a href="#/">Go To Public</a>',
         private: true,
       })
-      .when('/private2', {
-        template: '<h1>Private Page 2</h1><a href="#/">Go To Public</a>',
-        private: true,
-      })
-      .when('/private3', {
-        template: '<h1>Private Page 3</h1><a href="#/">Go To Public</a>',
-        private: true,
+      .when('/login', {
+        controller: 'LoginCtrl',
+        controllerAs: 'auth',
+        template: '<h1>Login</h1><button ng-click="auth.login()">Login</button>',
       })
   })
   .run(($rootScope, $location, authFactory) => {
     $rootScope.$on('$routeChangeStart', function (e, nextRoute) {
-      if (nextRoute.$$route.private && !authFactory.isLoggedIn) {
-        $location.path('/')
+      if (nextRoute.$$route.private && !authFactory.isLoggedIn()) {
+        $location.path('/login')
       }
     })
   })
-  .factory('authFactory', () => ({
-    isLoggedIn: false,
-  }))
+  .factory('authFactory', () => {
+    let loggedInStatus = false
+    // firebae.auth().currentUser ?
+    // or set onAuthStateChange loggedInStatus to true/false
+
+    return {
+      isLoggedIn () {
+        return loggedInStatus
+      },
+      login () {
+        loggedInStatus = true
+      }
+    }
+  })
+  .controller('LoginCtrl', function ($location, authFactory) {
+    this.login = function () {
+      authFactory.login()
+      $location.path('/')
+    }
+  })
